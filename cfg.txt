@@ -1,0 +1,11 @@
+# this is the default config for scavenge
+# syntax: keyName keyValue
+# no quoting is required for either keyName or keyValue
+# escape # with \#, and \ with \\
+
+where https://scavenge.onrender.com/repo/
+# where to get packages from
+
+wget y
+# whether to use wget over aria2c (TODO)
+# y/n is used for "boolean values"
