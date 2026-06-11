@@ -1,7 +1,8 @@
 #include "everything.h"
 c pkgPrfx[] = "&+.-";
 
-void readCfg() {} // temporarily here
+void readCfg() {} // temporarily here\
+// use ctx_txt, ctx_txt_len
 
 size_t pkgArgType(c*inp) {
 	size_t count = 1;
