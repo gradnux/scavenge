@@ -10,6 +10,7 @@ c*verbs[ACTIONS] = {
 	"purging",
 	"removing"
 };
+LinkedArr*actions[ACTIONS] = {NULL};
 
 size_t pkgArgType(c*inp) {
 	size_t count = 0;
@@ -39,7 +40,7 @@ bool isPkg() {
 	}
 	if (okay==argc) return true;
 	size_t mistyped = argc-okay;
-	if (mistyped>0) fprintf(stderr,"note: you may have mistyped %zu arg%s\n",mistyped,(mistyped>1)?"s":"");
+	if (okay>1) fprintf(stderr,"note: you may have mistyped %zu arg%s\n",mistyped,(mistyped>1)?"s":"");
 	return false;
 }
 
@@ -47,24 +48,55 @@ LinkedArr*filterArgvByType(size_t type) {
 	LinkedArr*res = NULL;
 	size_t count = 1;
 	while (count<argc) {
-		if (pkgArgType(argv[count])==type) res=arrAppend(res,argv[count]); // wow so convenient!
+		if (pkgArgType(argv[count])==type) res=arrAppend(res,argv[count]+1); // wow so convenient!
 		count++;
 	}
 	return res;
 }
 
+void freeActions() {
+	size_t count = 0;
+	while (count<ACTIONS) arrFree(actions[count++]);
+}
+
 int pkgMain() {
 	if (!(boolCfg("wget"))) fprintf(stderr,"note: aria2c is currently unsupported\n");
-	LinkedArr*actions[ACTIONS] = {NULL};
+	LinkedArr*all = NULL;
+	bool dup = false;
 	bool prant = false;
 	size_t count = 0;
 	while (count<ACTIONS) {
-		actions[count] = filterArgvByType(count);
+		LinkedArr*root = filterArgvByType(count);
+		actions[count] = root;
 		size_t len = sizeofA(actions[count]);
-		if (len>0) printf("%s%s %zu package%s",prant?", ":"",verbs[count],len,(len>1)?"s":"");
-		prant=((prant)||(len>0));
+		if (len>0) {
+			if (!(dup)) {
+				while (root!=NULL) {
+					LinkedArr*allIter = all;
+					while (allIter!=NULL) {
+						if (strcmp(allIter->val,root->val)==0) {
+							dup = true;
+							break;
+						}
+						allIter = allIter->next;
+					}
+					if (dup) break;
+					all = arrAppend(all,root->val);
+					root = root->next;
+				}
+			}
+			printf("%s%s %zu package%s",prant?", ":"",verbs[count],len,(len>1)?"s":"");
+			prant = true;
+		}
 		count++;
 	}
 	if (prant) puts("...");
+	arrFree(all);
+	if (dup) {
+		fprintf(stderr,"found conflicting actions for one (or more) package name(s)\n");
+		freeActions();
+		return 1;
+	}
+	freeActions();
 	return 0;
 }
