@@ -30,3 +30,8 @@ size_t realSizeof(size_t acc, LinkedArr*a) {
 size_t sizeofA(LinkedArr*a) {
 	return realSizeof(0,a);
 }
+
+c*getCmd() {
+	if (argc<2) return NULL;
+	return ((*argv[1]==45)||(isPkgArg(argv[1])))?NULL:argv[1];
+}

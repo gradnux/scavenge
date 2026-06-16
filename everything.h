@@ -30,6 +30,7 @@ LinkedArr*arrNew(void*);
 LinkedArr*arrAppend(LinkedArr*,void*);
 void arrFree(LinkedArr*);
 size_t sizeofA(LinkedArr*);
+c*getCmd();
 
 bool readCfg();
 void freeCfg();
@@ -39,4 +40,6 @@ bool boolCfg(c*);
 bool isPkgArg(c*);
 bool isPkg();
 int pkgMain();
+
+int listCmd();
 #endif
